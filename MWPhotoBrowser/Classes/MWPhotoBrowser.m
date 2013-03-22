@@ -320,18 +320,6 @@ navigationBarBackgroundImageLandscapePhone = _navigationBarBackgroundImageLandsc
 	// Layout manually (iOS < 5)
     if (SYSTEM_VERSION_LESS_THAN(@"5")) [self viewWillLayoutSubviews];
     
-    // Status bar
-    if (self.wantsFullScreenLayout && UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
-        _previousStatusBarStyle = [[UIApplication sharedApplication] statusBarStyle];
-        [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackTranslucent animated:animated];
-    }
-    
-    // Navigation bar appearance
-    if (!_viewIsActive && [self.navigationController.viewControllers objectAtIndex:0] != self) {
-        [self storePreviousNavBarAppearance];
-    }
-    [self setNavBarAppearance:animated];
-    
     // Update UI
 	[self hideControlsAfterDelay];
     
@@ -346,8 +334,6 @@ navigationBarBackgroundImageLandscapePhone = _navigationBarBackgroundImageLandsc
         // State
         _viewIsActive = NO;
         
-        // Bar state / appearance
-        [self restorePreviousNavBarAppearance:animated];
         
     }
     
@@ -369,44 +355,6 @@ navigationBarBackgroundImageLandscapePhone = _navigationBarBackgroundImageLandsc
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     _viewIsActive = YES;
-}
-
-#pragma mark - Nav Bar Appearance
-
-- (void)setNavBarAppearance:(BOOL)animated {
-    self.navigationController.navigationBar.tintColor = nil;
-    self.navigationController.navigationBar.barStyle = UIBarStyleBlackTranslucent;
-    if ([[UINavigationBar class] respondsToSelector:@selector(appearance)]) {
-        [self.navigationController.navigationBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
-        [self.navigationController.navigationBar setBackgroundImage:nil forBarMetrics:UIBarMetricsLandscapePhone];
-    }
-}
-
-- (void)storePreviousNavBarAppearance {
-    _didSavePreviousStateOfNavBar = YES;
-    self.previousNavBarTintColor = self.navigationController.navigationBar.tintColor;
-    _previousNavBarStyle = self.navigationController.navigationBar.barStyle;
-    if ([[UINavigationBar class] respondsToSelector:@selector(appearance)]) {
-        self.navigationBarBackgroundImageDefault = [self.navigationController.navigationBar backgroundImageForBarMetrics:UIBarMetricsDefault];
-        self.navigationBarBackgroundImageLandscapePhone = [self.navigationController.navigationBar backgroundImageForBarMetrics:UIBarMetricsLandscapePhone];
-    }
-}
-
-- (void)restorePreviousNavBarAppearance:(BOOL)animated {
-    if (_didSavePreviousStateOfNavBar) {
-        self.navigationController.navigationBar.tintColor = _previousNavBarTintColor;
-        self.navigationController.navigationBar.barStyle = _previousNavBarStyle;
-        if ([[UINavigationBar class] respondsToSelector:@selector(appearance)]) {
-            [self.navigationController.navigationBar setBackgroundImage:_navigationBarBackgroundImageDefault forBarMetrics:UIBarMetricsDefault];
-            [self.navigationController.navigationBar setBackgroundImage:_navigationBarBackgroundImageLandscapePhone forBarMetrics:UIBarMetricsLandscapePhone];
-        }
-        // Restore back button if we need to
-        if (_previousViewControllerBackButton) {
-            UIViewController *previousViewController = [self.navigationController topViewController]; // We've disappeared so previous is now top
-            previousViewController.navigationItem.backBarButtonItem = _previousViewControllerBackButton;
-            self.previousViewControllerBackButton = nil;
-        }
-    }
 }
 
 #pragma mark - Layout
@@ -873,13 +821,7 @@ navigationBarBackgroundImageLandscapePhone = _navigationBarBackgroundImageLandsc
         if (![UIApplication sharedApplication].statusBarHidden) {
             CGRect statusBarFrame = [[UIApplication sharedApplication] statusBarFrame];
             statusBarHeight = MIN(statusBarFrame.size.height, statusBarFrame.size.width);
-        }
-        
-        // Set navigation bar frame
-        CGRect navBarFrame = self.navigationController.navigationBar.frame;
-        navBarFrame.origin.y = statusBarHeight;
-        self.navigationController.navigationBar.frame = navBarFrame;
-        
+        }        
     }
     
     // Captions
