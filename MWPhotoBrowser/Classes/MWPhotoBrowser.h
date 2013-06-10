@@ -21,6 +21,8 @@
 
 // Delgate
 @class MWPhotoBrowser;
+
+
 @protocol MWPhotoBrowserDelegate <NSObject>
 - (NSUInteger)numberOfPhotosInPhotoBrowser:(MWPhotoBrowser *)photoBrowser;
 - (id<MWPhoto>)photoBrowser:(MWPhotoBrowser *)photoBrowser photoAtIndex:(NSUInteger)index;
@@ -33,6 +35,10 @@
 
 // Properties
 @property (nonatomic) BOOL displayActionButton;
+@property (nonatomic, strong) UIImage *previousButtonImage, *nextButtonImage;
+@property (nonatomic, strong) UIToolbar *toolbar;
+@property (nonatomic, assign) BOOL customNavBarAppearance;
+@property (nonatomic, assign) BOOL customToolbarAppearance;
 
 // Init
 - (id)initWithPhotos:(NSArray *)photosArray  __attribute__((deprecated)); // Depreciated
@@ -43,6 +49,8 @@
 
 // Set page that photo browser starts on
 - (void)setInitialPageIndex:(NSUInteger)index;
+
+- (void)setNavBarAppearance:(BOOL)animated;
 
 @end
 
