@@ -39,6 +39,8 @@
 @property (nonatomic, strong) UIToolbar *toolbar;
 @property (nonatomic, assign) BOOL customNavBarAppearance;
 @property (nonatomic, assign) BOOL customToolbarAppearance;
+@property (nonatomic, assign) BOOL hasToolbar;
+
 
 // Init
 - (id)initWithPhotos:(NSArray *)photosArray  __attribute__((deprecated)); // Depreciated
