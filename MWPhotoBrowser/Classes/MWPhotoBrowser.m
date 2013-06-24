@@ -58,7 +58,7 @@
 	BOOL _rotating;
     BOOL _viewIsActive; // active as in it's in the view heirarchy
     BOOL _didSavePreviousStateOfNavBar;
-    
+    BOOL _areControlsHidden;
 }
 
 // Private Properties
@@ -106,7 +106,6 @@
 - (void)hideControlsAfterDelay;
 - (void)setControlsHidden:(BOOL)hidden animated:(BOOL)animated permanent:(BOOL)permanent;
 - (void)toggleControls;
-- (BOOL)areControlsHidden;
 
 // Data
 - (NSUInteger)numberOfPhotos;
@@ -295,9 +294,10 @@ navigationBarBackgroundImageLandscapePhone = _navigationBarBackgroundImageLandsc
         if (_displayActionButton) [items addObject:_actionButton];
         [_toolbar setItems:items];
         [items release];
-        [self updateNavigation];
     }
     
+    [self updateNavigation];
+
     // Navigation buttons
     if ([self.navigationController.viewControllers objectAtIndex:0] == self) {
         // We're first on stack so show done button
@@ -370,10 +370,11 @@ navigationBarBackgroundImageLandscapePhone = _navigationBarBackgroundImageLandsc
     if (!_viewIsActive && [self.navigationController.viewControllers objectAtIndex:0] != self) {
         [self storePreviousNavBarAppearance];
     }
-    if (!_customNavBarAppearance)
-        [self setNavBarAppearance:animated];
+    
+    [self setNavBarAppearance:animated];
     
     // Update UI
+    _areControlsHidden = NO;
 	[self hideControlsAfterDelay];
     
 }
@@ -417,7 +418,7 @@ navigationBarBackgroundImageLandscapePhone = _navigationBarBackgroundImageLandsc
 - (void)setNavBarAppearance:(BOOL)animated {
     self.navigationController.navigationBar.tintColor = nil;
     self.navigationController.navigationBar.barStyle = UIBarStyleBlackTranslucent;
-    if ([[UINavigationBar class] respondsToSelector:@selector(appearance)]) {
+    if (!_customNavBarAppearance && [[UINavigationBar class] respondsToSelector:@selector(appearance)]) {
         [self.navigationController.navigationBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
         [self.navigationController.navigationBar setBackgroundImage:nil forBarMetrics:UIBarMetricsLandscapePhone];
     }
@@ -585,7 +586,7 @@ navigationBarBackgroundImageLandscapePhone = _navigationBarBackgroundImageLandsc
             if ([photo caption]) captionView = [[[MWCaptionView alloc] initWithPhoto:photo] autorelease];
         }
     }
-    captionView.alpha = [self areControlsHidden] ? 0 : 1; // Initial alpha
+    captionView.alpha = _areControlsHidden? 0 : 1; // Initial alpha
     return captionView;
 }
 
@@ -898,6 +899,7 @@ navigationBarBackgroundImageLandscapePhone = _navigationBarBackgroundImageLandsc
 // If permanent then we don't set timers to hide again
 - (void)setControlsHidden:(BOOL)hidden animated:(BOOL)animated permanent:(BOOL)permanent {
     
+    _areControlsHidden = hidden;
     // Cancel any timers
     [self cancelControlHiding];
 	
@@ -967,15 +969,21 @@ navigationBarBackgroundImageLandscapePhone = _navigationBarBackgroundImageLandsc
 
 // Enable/disable control visiblity timer
 - (void)hideControlsAfterDelay {
-	if (![self areControlsHidden]) {
+	if (!_areControlsHidden) {
         [self cancelControlHiding];
 		_controlVisibilityTimer = [[NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(hideControls) userInfo:nil repeats:NO] retain];
 	}
 }
 
-- (BOOL)areControlsHidden { return (_hasToolbar || _toolbar.alpha == 0); /* [UIApplication sharedApplication].isStatusBarHidden; */ }
-- (void)hideControls { [self setControlsHidden:YES animated:YES permanent:NO]; }
-- (void)toggleControls { [self setControlsHidden:![self areControlsHidden] animated:YES permanent:NO]; }
+- (void)hideControls
+{
+    [self setControlsHidden:YES animated:YES permanent:NO];
+}
+
+- (void)toggleControls
+{
+    [self setControlsHidden:!_areControlsHidden animated:YES permanent:NO];
+}
 
 #pragma mark - Properties
 
