@@ -37,6 +37,7 @@
 @property (nonatomic) BOOL displayActionButton;
 @property (nonatomic, strong) UIImage *previousButtonImage, *nextButtonImage;
 @property (nonatomic, strong) UIToolbar *toolbar;
+@property (nonatomic, assign) NSUInteger currentPageIndex;
 @property (nonatomic, assign) BOOL customNavBarAppearance;
 @property (nonatomic, assign) BOOL customToolbarAppearance;
 @property (nonatomic, assign) BOOL hasToolbar;

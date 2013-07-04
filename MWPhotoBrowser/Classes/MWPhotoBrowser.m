@@ -36,7 +36,7 @@
 	
 	// Paging
 	NSMutableSet *_visiblePages, *_recycledPages;
-	NSUInteger _currentPageIndex;
+//	NSUInteger _currentPageIndex;
 	NSUInteger _pageIndexBeforeRotation;
 	
 	// Navigation & controls
